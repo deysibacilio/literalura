@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DatosLibros(
 
@@ -17,12 +18,21 @@ public record DatosLibros(
 
         @JsonAlias("download_count") Double numeroDeDescargas
 ) {
+
+    //    public String toString() {
+//        return "\n-----LIBRO-----"+
+//                "\nTitulo: " + titulo +
+//                "\nAutor: " + autor +
+//                "\nIdiomas: " + idiomas+ //creo que puedo crear una clase de idiomas
+//                "\nNumero de descargas: " + numeroDeDescargas +
+//                "\n---------------";
+//    }
     @Override
     public String toString() {
-        return "\n-----LIBRO-----"+
+        return "\n-----LIBRO-----" +
                 "\nTitulo: " + titulo +
-                "\nAutor: " + autor.stream().map(DatosAutor::nombre).collect(Collectors.joining(","))+
-                "\nIdiomas: " + idiomas+ //creo que puedo crear una clase de idiomas
+                "\nAutor: " + autor.stream().map(DatosAutor::nombre).collect(Collectors.joining(",")) +
+                "\nIdiomas: " + idiomas.stream().collect(Collectors.joining(",")) +
                 "\nNumero de descargas: " + numeroDeDescargas +
                 "\n---------------";
     }
