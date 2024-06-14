@@ -14,7 +14,7 @@ public record DatosLibros(
 
         @JsonAlias("authors") List<DatosAutor> autor,
 
-        @JsonAlias("languages") List<String> idiomas,
+        @JsonAlias("languages") List<String> idioma,
 
         @JsonAlias("download_count") Double numeroDeDescargas
 ) {
@@ -27,13 +27,13 @@ public record DatosLibros(
 //                "\nNumero de descargas: " + numeroDeDescargas +
 //                "\n---------------";
 //    }
-    @Override
-    public String toString() {
-        return "\n-----LIBRO-----" +
-                "\nTitulo: " + titulo +
-                "\nAutor: " + autor.stream().map(DatosAutor::nombre).collect(Collectors.joining(",")) +
-                "\nIdiomas: " + idiomas.stream().collect(Collectors.joining(",")) +
-                "\nNumero de descargas: " + numeroDeDescargas +
-                "\n---------------";
-    }
+//    @Override
+//    public String toString() {
+//        return "\n-----LIBRO-----" +
+//                "\nTitulo: " + titulo +
+//                "\nAutor: " + autor.stream().map(DatosAutor::nombre).collect(Collectors.joining(",")) +
+//                "\nIdiomas: " + idioma.stream().collect(Collectors.joining(",")) +
+//                "\nNumero de descargas: " + numeroDeDescargas +
+//                "\n---------------";
+//    }
 }
