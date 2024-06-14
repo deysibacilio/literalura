@@ -56,7 +56,7 @@ public class Principal {
                 opcion = Integer.parseInt(teclado.nextLine()); // Leer la opción como entero
                 if (opcion < 0 || opcion > numeroOpciones) {
                     System.out.println("Opción fuera de rango. Por favor, elija una opción válida.");
-                    continue; // Reiniciar el ciclo si la opción no es válida
+                    continue; // Reinicia el ciclo si la opción no es válida
                 }
 
                 switch (opcion) {
@@ -76,7 +76,7 @@ public class Principal {
                         listarLibrosPorIdioma();
                         break;
                     case 0:
-                        System.out.println("Finalizando la aplicación\nNos vemos..\n\n (\\__/)\n (='.'=)\n (\")_(\") ");
+                        System.out.println("Finalizando la aplicación\nNos vemos..\n\n (\\__/)\n (='.'=)\n (\")_(\")    ...by ©DEYSI"+"\n\n");
                         break;
                     default:
                         System.out.println("Opción inválida");
@@ -112,35 +112,41 @@ public class Principal {
     private void buscarLibro() {
         DatosLibros datos = getDatosLibro();
         if (datos != null) {
-            DatosAutor datosAutor = datos.autor().get(0);
+            try {
+                DatosAutor datosAutor = datos.autor().get(0);
 
-            // Buscar si el libro ya existe en la base de datos
-            Optional<Libros> libroExistente = libroRepository.findByTitulo(datos.titulo());
+                // Buscar si el libro ya existe en la base de datos
+                Optional<Libros> libroExistente = libroRepository.findByTitulo(datos.titulo());
 
-            if (libroExistente.isPresent()) {
-                // Si el libro ya existe, solo lo mostramos y no intentamos guardarlo de nuevo
-                System.out.println(libroExistente.get().toString());
-            } else {
-                // Buscar si el autor ya existe en la base de datos
-                Optional<Autores> autorExistente = autoresRepository.findByNombre(datosAutor.nombre());
-
-                Autores autor;
-                if (autorExistente.isPresent()) {
-                    autor = autorExistente.get();
+                if (libroExistente.isPresent()) {
+                    // Si el libro ya existe, solo lo mostramos y no intentamos guardarlo de nuevo
+                    System.out.println(libroExistente.get().toString());
                 } else {
-                    // Guardar el autor si no existe
-                    autor = new Autores(datosAutor);
-                    autoresRepository.save(autor);
+                    // Buscar si el autor ya existe en la base de datos
+                    Optional<Autores> autorExistente = autoresRepository.findByNombre(datosAutor.nombre());
+
+                    Autores autor;
+                    if (autorExistente.isPresent()) {
+                        autor = autorExistente.get();
+                    } else {
+                        // Guardar el autor si no existe
+                        autor = new Autores(datosAutor);
+                        autoresRepository.save(autor);
+                    }
+
+                    // Crear el libro con el autor existente o recién creado
+                    Libros libro = new Libros(datos);
+                    libro.setAutor(autor);
+                    libroRepository.save(libro);
+                    System.out.println(libro.toString());
+
+                    // Llamar al método crearLibro para asociar el libro al autor
+                    crearLibro(datos, autor);
                 }
-
-                // Crear el libro con el autor existente o recién creado
-                Libros libro = new Libros(datos);
-                libro.setAutor(autor);
-                libroRepository.save(libro);
-                System.out.println(libro.toString());
-
-                // Llamar al método crearLibro para asociar el libro al autor
-                crearLibro(datos, autor);
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("No se encontró ningún autor para el libro.");
+            } catch (Exception e) {
+                System.out.println("Ocurrió un error al buscar o guardar el libro: " + e.getMessage());
             }
         }
     }
@@ -148,12 +154,13 @@ public class Principal {
         // Verificar si el libro ya existe para evitar duplicados
         Optional<Libros> libroExistente = libroRepository.findByTitulo(datosLibros.titulo());
         if (libroExistente.isPresent()) {
-            System.out.println("El libro '" + datosLibros.titulo() + "' se encuentra guardado en la Base de Datos.");
+            System.out.println("El libro '" + datosLibros.titulo() + "' se a guardado en la Base de Datos.");
         } else {
             Libros libro = new Libros(datosLibros);
             libro.setAutor(autor); // Establecer el autor en el libro
             autor.getLibros().add(libro); // Agregar el libro a la lista de libros del autor
             libroRepository.save(libro); // Guardar el libro
+            autoresRepository.save(autor); // Guardar el autor con la lista actualizada de libros
             System.out.println("Libro '" + libro.getTitulo() + "' creado y asociado al autor '" + autor.getNombre() + "'.");
         }
     }
@@ -172,7 +179,7 @@ public class Principal {
     }
 
     private void listarAutoresRegistrados() {
-        List<Autores> autores = autoresRepository.findAll();
+        List<Autores> autores = autoresRepository.findAllWithLibros();
         if (autores.isEmpty()) {
             System.out.println("No hay autores registrados.");
         } else {
@@ -185,22 +192,33 @@ public class Principal {
 
     private void listarAutoresVivos() {
 
-        System.out.println("Ingrese el año para listar los autores vivos:");
-        Integer año = teclado.nextInt();
-        teclado.nextLine();
+        try {
+            System.out.println("Ingrese el año para listar los autores vivos:");
+            int año = teclado.nextInt();
+            teclado.nextLine(); // Consumir el salto de línea pendiente
 
-        // Buscar autores cuya fecha de nacimiento sea anterior o igual al año y su fecha de fallecimiento sea posterior o igual al año
-        List<Autores> autores = autoresRepository.findByFechaDeNacimientoLessThanEqualAndFechaDeFallecimientoGreaterThanEqual(año, año);
-
-        if (autores.isEmpty()) {
-            System.out.println("No hay autores vivos en el año " + año);
-        } else {
-            System.out.println("---- Autores Vivos en el Año " + año + " ----");
-            for (Autores autor : autores) {
-                System.out.println(autor.toString());
+            // Validar que el año ingresado sea válido (por ejemplo, mayor que cero si es un año válido)
+            if (año <= 0) {
+                System.out.println("El año ingresado no es válido.");
+                return;
             }
-        }
 
+            // Llamar al método del repositorio para buscar autores vivos en el año especificado
+            List<Autores> autores = autoresRepository.findByFechaDeNacimientoLessThanEqualAndFechaDeFallecimientoGreaterThanEqual(año, año);
+
+            if (autores.isEmpty()) {
+                System.out.println("No hay autores vivos en el año " + año);
+            } else {
+                System.out.println("---- Autores Vivos en el Año " + año + " ----");
+                for (Autores autor : autores) {
+                    System.out.println(autor.toString());
+                }
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Debes ingresar un número entero para el año.");
+            // Limpiar el buffer del scanner
+            teclado.nextLine();
+        }
     }
 
     private void listarLibrosPorIdioma() {
@@ -209,7 +227,7 @@ public class Principal {
 
 
         while (!entradaValida) {
-            System.out.println("Ingrese el idioma para listar libros (es, en, fr, fi, pt): ");
+            System.out.println("Ingrese el idioma para listar libros: ");
 
             // Guía de idiomas válidos
             System.out.println("--- Guía de idiomas válidos ---");

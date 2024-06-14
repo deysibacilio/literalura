@@ -81,28 +81,28 @@ public class Autores {
     public String toString() {
         StringBuilder librosToString = new StringBuilder();
         try {
-            Hibernate.initialize(libros); // Intenta inicializar la colección libros
+            Hibernate.initialize(libros); // Inicializa la colección libros
             if (libros != null) {
                 for (Libros libro : libros) {
                     librosToString.append(libro.getTitulo()).append(", ");
                 }
                 if (librosToString.length() > 0) {
-                    librosToString.setLength(librosToString.length() - 2); // Eliminar la última coma y espacio
+                    librosToString.setLength(librosToString.length() - 2); // Elimina la última coma y espacio
                 }
             }
-            return "Autores{" +
-                    "nombre='" + nombre + '\'' +
-                    ", fechaDeNacimiento=" + fechaDeNacimiento +
-                    ", fechaDeFallecimiento=" + fechaDeFallecimiento +
-                    ", libros=[" + librosToString.toString() + "]" +
-                    '}';
+            return "\n'''''''''''' AUTOR ''''''''''''''" +
+                    "\n  Nombre: '" + nombre + '\'' +
+                    ",\n  Fecha de Nacimiento: " + fechaDeNacimiento +
+                    ",\n  Fecha de Fallecimiento: " + fechaDeFallecimiento +
+                    ",\n  Libros: [" + librosToString.toString() + "]" +
+                    "\n''''''''''''''''''''''''''";
         } catch (LazyInitializationException e) {
-            return "Autores{" +
-                    "nombre='" + nombre + '\'' +
-                    ", fechaDeNacimiento=" + fechaDeNacimiento +
-                    ", fechaDeFallecimiento=" + fechaDeFallecimiento +
-                    ", libros=No inicializado" +
-                    '}';
+            return "\n'''''''''''' AUTOR ''''''''''''''" +
+                    "\n  Nombre: '" + nombre + '\'' +
+                    ",\n  Fecha de Nacimiento: " + fechaDeNacimiento +
+                    ",\n  Fecha de Fallecimiento: " + fechaDeFallecimiento +
+                    ",\n  Libros: No inicializado" +
+                    "\n''''''''''''''''''''''''''";
         }
     }
 }

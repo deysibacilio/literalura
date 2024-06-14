@@ -1,6 +1,5 @@
 package com.alura.literalura.model;
 
-
 import jakarta.persistence.*;
 
 @Entity
@@ -14,7 +13,7 @@ public class Libros {
     @Column(unique = true)
     private String titulo;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // Preferiblemente LAZY para evitar cargar innecesariamente
+    @ManyToOne(fetch = FetchType.LAZY)  // Usamos LAZY para evitar cargar innecesariamente los datos
     @JoinColumn(name = "autor_id", nullable = false)
     private Autores autor;
 
@@ -75,11 +74,11 @@ public class Libros {
 
     @Override
     public String toString() {
-        return "Libros{" +
-                "titulo='" + titulo + '\'' +
-                ", autor=" + autor.getNombre() +
-                ", idioma=" + idioma +
-                ", numeroDeDescargas=" + numeroDeDescargas +
-                '}';
+        return "\n****** LIBRO ******"+
+                "\n  Título: '" + titulo + '\'' +
+                ",\n  Autor: " + (autor != null ? autor.getNombre() : "Desconocido") +
+                ",\n  Idioma: " + idioma +
+                ",\n  Número de Descargas: " + numeroDeDescargas +
+                "\n*******************";
     }
 }
